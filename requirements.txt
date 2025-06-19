@@ -1,0 +1,5 @@
+streamlit
+music21
+tensorflow
+keras
+numpy

@@ -1,5 +1,6 @@
 streamlit
-music21
-tensorflow
 keras
+tensorflow
+music21
 numpy
+

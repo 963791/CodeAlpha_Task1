@@ -3,7 +3,7 @@ import numpy as np
 import json
 from keras.models import Sequential
 from keras.layers import LSTM, Dropout, Dense, Activation
-from keras.utils import to_categorical
+from keras.utils import to_categorical  
 from music21 import note, chord, stream
 import random
 
@@ -15,8 +15,13 @@ with open("classical-music-midi-metadata.json", "r") as f:
 
 st.success(f"✅ Loaded {len(notes)} notes from JSON.")
 
-# 🔢 Prepare Sequences
+# 🚨 Check if enough notes exist
 sequence_length = 100
+if len(notes) < sequence_length:
+    st.error(f"❌ Not enough notes to create sequences. At least {sequence_length} notes required.")
+    st.stop()
+
+# 🔢 Prepare Sequences
 pitch_names = sorted(set(notes))
 note_to_int = {note: number for number, note in enumerate(pitch_names)}
 
@@ -44,42 +49,4 @@ model.add(Dense(256))
 model.add(Dropout(0.3))
 model.add(Dense(n_vocab))
 model.add(Activation('softmax'))
-model.compile(loss='categorical_crossentropy', optimizer='rmsprop')
-
-st.info("🧠 Training model (this may take a while)...")
-model.fit(X, y, epochs=5, batch_size=64)
-st.success("✅ Model trained!")
-
-# 🎶 Generate Music
-int_to_note = {number: note for note, number in note_to_int.items()}
-start = random.randint(0, len(network_input) - 1)
-pattern = network_input[start]
-generated_notes = []
-
-for note_index in range(300):
-    input_seq = np.reshape(pattern, (1, len(pattern), 1)) / float(n_vocab)
-    prediction = model.predict(input_seq, verbose=0)
-    index = np.argmax(prediction)
-    result = int_to_note[index]
-    generated_notes.append(result)
-    pattern.append(index)
-    pattern = pattern[1:]
-
-# 💾 Convert to MIDI and Save
-def create_midi(prediction_output, filename="generated_classical.mid"):
-    output_notes = []
-    for pattern in prediction_output:
-        if '.' in pattern or pattern.isdigit():
-            notes_in_chord = [note.Note(int(n)) for n in pattern.split('.')]
-            new_chord = chord.Chord(notes_in_chord)
-            output_notes.append(new_chord)
-        else:
-            new_note = note.Note(pattern)
-            output_notes.append(new_note)
-    midi_stream = stream.Stream(output_notes)
-    midi_stream.write('midi', fp=filename)
-
-create_midi(generated_notes)
-st.success("🎵 Music generated and saved as `generated_classical.mid`!")
-
-
+model.compile(loss='categorical_crossentropy', optimizer='_

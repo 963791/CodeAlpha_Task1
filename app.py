@@ -49,4 +49,5 @@ model.add(Dense(256))
 model.add(Dropout(0.3))
 model.add(Dense(n_vocab))
 model.add(Activation('softmax'))
-model.compile(loss='categorical_crossentropy', optimizer='_
+model.compile(loss='categorical_crossentropy', optimizer='rmsprop')
+
